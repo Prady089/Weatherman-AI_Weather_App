@@ -1,4 +1,4 @@
-fetch("weather.json")
+fetch("./weather.json?v=" + Date.now())
   .then(r => r.json())
   .then(d => {
     document.getElementById("city").textContent = d.city;
@@ -15,4 +15,7 @@ fetch("weather.json")
     document.getElementById("noon").textContent = d.blocks.noon;
     document.getElementById("evening").textContent = d.blocks.evening;
     document.getElementById("night").textContent = d.blocks.night;
+  })
+  .catch(err => {
+    console.error("Failed to load weather.json", err);
   });
