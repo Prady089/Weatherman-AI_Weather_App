@@ -1,0 +1,67 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg, #3a7bd5, #00d2ff);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  background: #0f2a44;
+  color: #fff;
+  border-radius: 24px;
+  padding: 20px;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+.header p {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.main {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+.icon {
+  font-size: 56px;
+  margin-right: 16px;
+}
+.temp {
+  font-size: 56px;
+  font-weight: bold;
+}
+.desc {
+  opacity: 0.85;
+}
+
+.hi-lo, .stats {
+  display: flex;
+  justify-content: space-between;
+  background: #0b2036;
+  padding: 10px 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.blocks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.blocks div {
+  background: #0b2036;
+  padding: 10px;
+  border-radius: 14px;
+  text-align: center;
+}
