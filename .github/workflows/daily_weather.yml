@@ -1,0 +1,25 @@
+name: Daily Weather Push
+
+on:
+  schedule:
+    - cron: "0 11 * * *"   # 6 AM CST (UTC+5)
+  workflow_dispatch:
+
+jobs:
+  weather:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Send Weather Notification
+        env:
+         
