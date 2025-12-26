@@ -5,7 +5,7 @@ permissions:
 
 on:
   schedule:
-    - cron: "0 12 * * *"   # adjust for your timezone
+    - cron: "0 12 * * *"   # 6 AM CST
   workflow_dispatch:
 
 jobs:
@@ -20,16 +20,19 @@ jobs:
 
       - run: pip install requests
 
-      - name: Generate weather.json
+      - name: Generate dashboard
         env:
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-        run: |
-          python generate_weather_json.py
+          CITY: McKinney
+          LAT: "33.1546624"
+          LON: "-96.7180288"
+          TZ: America/Chicago
+        run: python generate_index_html.py
 
       - name: Commit dashboard
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add docs/weather.json
+          git add docs/index.html
           git commit -m "Update daily weather dashboard" || echo "No changes"
           git push
