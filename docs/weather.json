@@ -1,0 +1,17 @@
+{
+  "city": "McKinney",
+  "date": "Friday, December 26",
+  "now": 26,
+  "desc": "Clear sky",
+  "high": 27,
+  "low": 17,
+  "humidity": 57,
+  "wind": "5 km/h",
+  "rain": 0,
+  "blocks": {
+    "morning": "17\u201322\u00b0",
+    "noon": "23\u201327\u00b0",
+    "evening": "22\u201327\u00b0",
+    "night": "20\u201322\u00b0"
+  }
+}
