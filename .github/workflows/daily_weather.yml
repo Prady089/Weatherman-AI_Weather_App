@@ -2,14 +2,15 @@ name: Daily Weather Push
 
 on:
   schedule:
-    - cron: "0 11 * * *"   # 6 AM CST (UTC+5)
+    - cron: "0 11 * * *"   # 6 AM CST (UTC 11)
   workflow_dispatch:
 
 jobs:
   weather:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -18,8 +19,13 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          pip install requests
 
-      - name: Send Weather Notification
+      - name: Run weather notification script
         env:
-         
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
+        run: |
+          python weather_push.py
