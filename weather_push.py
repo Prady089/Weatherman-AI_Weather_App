@@ -16,7 +16,28 @@ url = (
 )
 data = requests.get(url).json()
 
-hourly = data["hourly"][:24:3]  # next 24 hrs, every 3 hours
+import sys
+
+if "hourly" in data:
+    hourly = data["hourly"][:24:3]
+    print("Using One Call API hourly data")
+else:
+    print("One Call API failed, falling back to forecast API")
+    print("Response was:", data)
+
+    # 🔁 FALLBACK: 3-hour forecast API
+    fallback_url = (
+        f"https://api.openweathermap.org/data/2.5/forecast"
+        f"?lat={LAT}&lon={LON}&units={UNITS}&appid={OW_KEY}"
+    )
+
+    fallback = requests.get(fallback_url).json()
+
+    if "list" not in fallback:
+        print("Fallback API also failed:", fallback)
+        sys.exit(1)
+
+    hourly = fallback["list"][:8]  # next 24 hours (3h blocks)
 
 times = []
 temps = []
