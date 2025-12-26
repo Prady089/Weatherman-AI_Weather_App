@@ -1,77 +1,166 @@
+#!/usr/bin/env python3
+import os
+import sys
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 
+# =========================
+# CONFIG
+# =========================
 LAT = 33.1546624
 LON = -96.7180288
 UNITS = "metric"
+TIMEZONE_NAME = "America/Chicago"
 
-OW_KEY = "${{ secrets.OPENWEATHER_API_KEY }}"
-PUSH_TOKEN = "${{ secrets.PUSHOVER_TOKEN }}"
-PUSH_USER = "${{ secrets.PUSHOVER_USER }}"
+# =========================
+# ENV VARS
+# =========================
+OW_KEY = os.getenv("OPENWEATHER_API_KEY")
+PUSH_TOKEN = os.getenv("PUSHOVER_TOKEN")
+PUSH_USER = os.getenv("PUSHOVER_USER")
 
-# Fetch weather
-url = (
-    f"https://api.openweathermap.org/data/3.0/onecall"
-    f"?lat={LAT}&lon={LON}&exclude=minutely,daily&units={UNITS}&appid={OW_KEY}"
+print("🔍 Starting Weather Automation")
+
+# Validate env vars
+if not OW_KEY:
+    print("❌ OPENWEATHER_API_KEY missing")
+    sys.exit(1)
+if not PUSH_TOKEN or not PUSH_USER:
+    print("❌ Pushover credentials missing")
+    sys.exit(1)
+
+print(f"✅ OpenWeather key detected (ends with {OW_KEY[-4:]})")
+
+# =========================
+# HELPERS
+# =========================
+def http_get(url, label):
+    print(f"\n➡️ Calling {label}")
+    print(url)
+    r = requests.get(url, timeout=20)
+    print(f"⬅️ HTTP {r.status_code}")
+    try:
+        data = r.json()
+    except Exception:
+        print("❌ Response is not JSON")
+        print(r.text)
+        sys.exit(1)
+    return r.status_code, data
+
+
+def send_push(title, message, priority=0):
+    print("📲 Sending push notification")
+    r = requests.post(
+        "https://api.pushover.net/1/messages.json",
+        data={
+            "token": PUSH_TOKEN,
+            "user": PUSH_USER,
+            "title": title,
+            "message": message,
+            "priority": priority,
+        },
+        timeout=20,
+    )
+    print(f"📨 Pushover HTTP {r.status_code}")
+    print(r.text)
+
+
+# =========================
+# STEP 1: TRY ONE CALL 3.0
+# =========================
+onecall_url = (
+    "https://api.openweathermap.org/data/3.0/onecall"
+    f"?lat={LAT}&lon={LON}"
+    f"&exclude=minutely,daily"
+    f"&units={UNITS}"
+    f"&appid={OW_KEY}"
 )
-data = requests.get(url).json()
 
-import sys
+status, data = http_get(onecall_url, "One Call 3.0")
 
-if "hourly" in data:
-    hourly = data["hourly"][:24:3]
-    print("Using One Call API hourly data")
+hourly = None
+source = None
+
+if status == 200 and "hourly" in data:
+    hourly = data["hourly"]
+    source = "onecall"
+    print(f"✅ One Call hourly data received ({len(hourly)} points)")
 else:
-    print("One Call API failed, falling back to forecast API")
-    print("Response was:", data)
+    print("⚠️ One Call API did not return hourly data")
+    print("Payload:", data)
 
-    # 🔁 FALLBACK: 3-hour forecast API
-    fallback_url = (
-        f"https://api.openweathermap.org/data/2.5/forecast"
-        f"?lat={LAT}&lon={LON}&units={UNITS}&appid={OW_KEY}"
+# =========================
+# STEP 2: FALLBACK TO FORECAST
+# =========================
+if hourly is None:
+    forecast_url = (
+        "https://api.openweathermap.org/data/2.5/forecast"
+        f"?lat={LAT}&lon={LON}"
+        f"&units={UNITS}"
+        f"&appid={OW_KEY}"
     )
 
-    fallback = requests.get(fallback_url).json()
+    status, data = http_get(forecast_url, "Forecast 3-hour API")
 
-    if "list" not in fallback:
-        print("Fallback API also failed:", fallback)
+    if status != 200 or "list" not in data:
+        print("❌ Forecast API also failed")
+        print("Payload:", data)
+
+        send_push(
+            "Weather Automation FAILED",
+            f"OpenWeather APIs failed.\n\nResponse:\n{data}",
+            priority=1,
+        )
         sys.exit(1)
 
-    hourly = fallback["list"][:8]  # next 24 hours (3h blocks)
+    hourly = data["list"]
+    source = "forecast"
+    print(f"✅ Forecast data received ({len(hourly)} points)")
+
+# =========================
+# STEP 3: BUILD 3-HOUR TIMELINE
+# =========================
+print(f"🧠 Using data source: {source}")
+
+slots = hourly[:8]  # next 24 hours (3-hour blocks)
 
 times = []
 temps = []
-rain_alerts = []
+rain_times = []
 
-for h in hourly:
-    time = datetime.fromtimestamp(h["dt"]).strftime("%-I%p")
-    temp = f"{round(h['temp'])}°"
-    times.append(time)
-    temps.append(temp)
+for h in slots:
+    ts = h["dt"]
+    temp = round(h["temp"])
+    time_str = datetime.fromtimestamp(ts, tz=timezone.utc).astimezone().strftime("%-I%p")
 
-    # 🌧 Rain detection
-    if "rain" in h:
-        rain_alerts.append(f"🌧 {time}")
+    times.append(time_str)
+    temps.append(f"{temp}°")
 
-# Build message (lock-screen friendly)
+    if "rain" in h or (
+        "weather" in h and any(w["main"].lower() == "rain" for w in h["weather"])
+    ):
+        rain_times.append(time_str)
+
+# =========================
+# STEP 4: FORMAT MESSAGE
+# =========================
+times_line = " ".join(f"{t:>4}" for t in times)
+temps_line = " ".join(f"{t:>4}" for t in temps)
+
 message = (
     "🌤️ Today – McKinney\n\n"
-    + " ".join(times) + "\n"
-    + " ".join(temps)
+    f"{times_line}\n"
+    f"{temps_line}"
 )
 
-# Add rain warning if any
-if rain_alerts:
-    message += "\n\n⚠️ Rain expected: " + ", ".join(rain_alerts)
+if rain_times:
+    message += "\n\n⚠️ Rain expected: " + ", ".join(rain_times)
 
-# Send push
-requests.post(
-    "https://api.pushover.net/1/messages.json",
-    data={
-        "token": PUSH_TOKEN,
-        "user": PUSH_USER,
-        "title": "Daily Weather",
-        "message": message,
-        "priority": 0
-    }
-)
+message += f"\n\n(source: {source})"
+
+# =========================
+# STEP 5: SEND PUSH
+# =========================
+send_push("Daily Weather", message)
+
+print("✅ Weather automation completed successfully")
