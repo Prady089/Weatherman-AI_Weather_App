@@ -1,0 +1,35 @@
+name: Live Rain Alert
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes
+  workflow_dispatch:
+
+jobs:
+  rain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+
+      - name: Restore rain state cache
+        uses: actions/cache@v4
+        with:
+          path: .state
+          key: rain-state-v1
+
+      - name: Run rain alerts
+        env:
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
+          CITY: McKinney
+          TZ: America/Chicago
+          LAT: "33.1546624"
+          LON: "-96.7180288"
+          UNITS: metric
+          RAIN_STATE_PATH: .state/rain_state.json
+        run: python rain_alert.py
