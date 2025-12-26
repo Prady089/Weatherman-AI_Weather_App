@@ -2,30 +2,28 @@ name: Daily Weather Push
 
 on:
   schedule:
-    - cron: "0 11 * * *"   # 6 AM CST (UTC 11)
+    - cron: "0 12 * * *"   # adjust to your preferred UTC time
   workflow_dispatch:
 
 jobs:
-  weather:
+  daily:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          pip install requests
-
-      - name: Run weather notification script
+      - run: pip install requests
+      - name: Run daily summary
         env:
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
           PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
           PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
-        run: |
-          python weather_push.py
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # optional
+          OPENAI_MODEL: gpt-4o-mini                    # optional
+          CITY: McKinney
+          TZ: America/Chicago
+          LAT: "33.1546624"
+          LON: "-96.7180288"
+          UNITS: metric
+        run: python weather_push.py
