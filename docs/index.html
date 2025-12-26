@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Today’s Weather</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div>
+        <h1 id="city">City</h1>
+        <p id="date">Date</p>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="icon">🌤️</div>
+      <div>
+        <div class="temp" id="temp">--°</div>
+        <div class="desc" id="desc">Condition</div>
+      </div>
+    </div>
+
+    <div class="hi-lo">
+      <div>⬆ <span id="high">--°</span></div>
+      <div>⬇ <span id="low">--°</span></div>
+    </div>
+
+    <div class="stats">
+      <div>💧 <span id="humidity">--%</span></div>
+      <div>🌬 <span id="wind">--</span></div>
+      <div>🌧 <span id="rain">--%</span></div>
+    </div>
+
+    <div class="blocks">
+      <div>🌅 <span id="morning"></span></div>
+      <div>🌞 <span id="noon"></span></div>
+      <div>🌆 <span id="evening"></span></div>
+      <div>🌙 <span id="night"></span></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
