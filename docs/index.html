@@ -1,40 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Today's Weather</title>
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg, #3a7bd5, #00d2ff);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.card {
+  background: #0f2a44;
+  color: #fff;
+  border-radius: 24px;
+  padding: 20px;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+.header h1 { margin: 0; font-size: 20px; }
+.header p { margin: 0; opacity: 0.8; }
+.main { display: flex; align-items: center; margin: 20px 0; }
+.icon { font-size: 56px; margin-right: 16px; }
+.temp { font-size: 56px; font-weight: bold; }
+.desc { opacity: 0.85; }
+.row {
+  display: flex;
+  justify-content: space-between;
+  background: #0b2036;
+  padding: 10px 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+.blocks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.block {
+  background: #0b2036;
+  padding: 10px;
+  border-radius: 14px;
+  text-align: center;
+}
+</style>
+</head>
+
 <body>
-  <div class="card">
-
-    <div class="header">
-      <h1 id="city">City</h1>
-      <p id="date">Date</p>
-    </div>
-
-    <div class="main">
-      <div class="icon">🌤️</div>
-      <div>
-        <div class="temp" id="temp">--°</div>
-        <div class="desc" id="desc">Condition</div>
-      </div>
-    </div>
-
-    <div class="hi-lo">
-      <div>⬆ <span id="high">--°</span></div>
-      <div>⬇ <span id="low">--°</span></div>
-    </div>
-
-    <div class="stats">
-      <div>💧 <span id="humidity">--%</span></div>
-      <div>🌬 <span id="wind">--</span></div>
-      <div>🌧 <span id="rain">--%</span></div>
-    </div>
-
-    <div class="blocks">
-      <div>🌅 <span id="morning">--</span></div>
-      <div>🌞 <span id="noon">--</span></div>
-      <div>🌆 <span id="evening">--</span></div>
-      <div>🌙 <span id="night">--</span></div>
-    </div>
-
+<div class="card">
+  <div class="header">
+    <h1>McKinney</h1>
+    <p>Friday, December 26</p>
   </div>
-<link rel="stylesheet" href="style.css?v=1" />
-...
-<script src="app.js?v=1"></script>
 
+  <div class="main">
+    <div class="icon">🌤️</div>
+    <div>
+      <div class="temp">24°</div>
+      <div class="desc">Clear sky</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div>⬆ 27°</div>
+    <div>⬇ 17°</div>
+  </div>
+
+  <div class="row">
+    <div>💧 61%</div>
+    <div>🌬 3 km/h</div>
+    <div>🌧 0%</div>
+  </div>
+
+  <div class="blocks">
+    <div class="block">Morning 🌅<br>17–22°</div><div class="block">Noon 🌞<br>23–27°</div><div class="block">Evening 🌆<br>24–27°</div><div class="block">Night 🌙<br>21–23°</div>
+  </div>
+</div>
 </body>
+</html>
