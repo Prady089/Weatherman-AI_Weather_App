@@ -4,6 +4,15 @@
 
 Weatherman reimagines weather notifications by treating them as signals, not streams. Built on automation and static generation principles, it delivers only the weather information that demands your attention—and stays silent otherwise.
 
+<img width="652" height="670" alt="image" src="https://github.com/user-attachments/assets/9ce6bec2-6ff5-4f40-8a33-ece650a0ea6d" />
+
+Mobile Notification
+
+![weather app](https://github.com/user-attachments/assets/f9e9bf8a-954f-4bd7-9fb4-a8a29619d182)
+
+
+
+
 ## Philosophy
 
 Most weather apps operate on a pull model: you check them when curious. Push-based apps suffer from notification fatigue, alerting you to every temperature fluctuation or cloud formation. Weatherman solves this by implementing **threshold-based event detection**—alerting only when weather crosses meaningful boundaries that affect your decisions.
